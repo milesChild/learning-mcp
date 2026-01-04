@@ -1,6 +1,5 @@
 from fastmcp import FastMCP
 from typing import Union
-import os
 from pathlib import Path
 import logging # docs caution against using stdout operations like print() and recommend using stderr
 

@@ -42,30 +42,24 @@ def save_note(content: str, filename: str) -> Union[str, Exception]:
     logger.info(f"Saved note to {path}")
     return f"Successfully saved to {path.as_posix()}"
 
-@mcp.tool(
-    name="read_note",
-    description="Read the file contents of a note with the provided filename. If the file does not exist, an error is thrown."
-)
-def read_note(filename: str) -> Union[str, Exception]:
+@mcp.resource("notes://list")
+def list_notes() -> str:
+    """Provides a list of all available notes in the system."""
+    files = [f.name for f in FILES_DIR.iterdir() if f.is_file()]
+    if not files:
+        return "No notes found."
+    return "Available notes:\n" + "\n".join(f"- {name}" for name in files)
+
+@mcp.resource("notes://{filename}")
+def read_note(filename: str) -> str:
+    """Reads the content of a specific note."""
     safe_name = Path(filename).name
-    if not safe_name:
-        raise ValueError("Filename cannot be empty.")
     path = FILES_DIR / safe_name
-
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            content = f.read()
-            logger.info(f"Read note from {path}")
-            return content
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Note '{safe_name}' not found.")
-
-@mcp.tool(
-    name="list_notes",
-    description="List all notes on the local device that can be read using read_note."
-)
-def list_notes() -> List[str]:
-    return [f.name for f in FILES_DIR.iterdir() if f.is_file()]
+    
+    if not path.exists():
+        return f"Error: Note '{safe_name}' not found."
+    
+    return path.read_text(encoding="utf-8")
 
 # Run as an HTTP server (needed for ChatGPT)
 if __name__ == "__main__":

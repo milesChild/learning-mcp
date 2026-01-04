@@ -1,7 +1,7 @@
 #!/bin/bash
 trap "kill 0" EXIT
 
-source ./venv/bin/activate
+source ./.venv/bin/activate
 python server.py &
 sleep 1
 

@@ -61,6 +61,23 @@ def read_note(filename: str) -> str:
     
     return path.read_text(encoding="utf-8")
 
-# Run as an HTTP server (needed for ChatGPT)
+@mcp.prompt("onboard-me")
+def onboard_prompt() -> str:
+    """Introduction to using this server."""
+    return """Welcome! I am your Note Assistant. 
+    I can help you:
+    1. View your existing notes by checking the 'notes://list' resource.
+    2. Save new ideas using the 'save_note' tool.
+    
+    How would you like to start?"""
+
+@mcp.prompt("summarize-note")
+def summarize_note(filename: str) -> str:
+    """Ask the LLM to summarize a specific note by name."""
+    return f"""Please perform the following steps:
+    1. Read the content of the note at 'notes://{filename}'.
+    2. Provide a 3-bullet point summary of that note."""
+
+# use ngrok to expose http so chatgpt web can access it
 if __name__ == "__main__":
     mcp.run(transport="sse", port=8000)
